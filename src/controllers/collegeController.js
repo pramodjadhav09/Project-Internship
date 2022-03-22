@@ -20,38 +20,43 @@ const isValidRequestBody = function (requestbody) {
 //CREATECOLLEGE-
 
 const createCollege = async function (req, res) {
-    let requestbody = req.body;
+    try {
+        let requestbody = req.body;
 
-    if (!isValidRequestBody(requestbody)) {
-        res.status(400).send({ status: false, message: "Invalid request parameters. Please provide college details" })
+        if (!isValidRequestBody(requestbody)) {
+           return res.status(400).send({ status: false, message: "Invalid request parameters. Please provide college details" })
+        }
+
+        //extract params
+        const { name, fullName, logoLink } = requestbody; //object destructuring
+
+        //validation starts----
+
+        if (!isValid(name)) {
+            res.status(400).send({ status: false, message: "Name is required" })
+            return
+        }
+
+        if (!isValid(fullName)) {
+            res.status(400).send({ status: false, message: "Full name is required" })
+            return
+        }
+
+        if (!isValid(logoLink)) {
+            res.status(400).send({ status: false, message: "Link/Url is required" })
+            return
+        }
+        //validation ends------------
+
+
+        const collegeData = { name, fullName, logoLink }
+        let newCollegeData = await collegeModel.create(collegeData);
+
+        res.status(201).send({ status: true, message: "college successfully created", data: newCollegeData })
+
+    } catch (error) {
+        res.status(500).send({message:"error",  error: error.message})
     }
-
-    //extract params
-    const { name, fullName, logoLink } = requestbody; //object destructuring
-
-    //validation starts----
-
-    if (!isValid(name)) {
-        res.status(400).send({ status: false, message: "Name is required" })
-        return
-    }
-
-    if (!isValid(fullName)) {
-        res.status(400).send({ status: false, message: "Full name is required" })
-        return
-    }
-
-    if (!isValid(logoLink)) {
-        res.status(400).send({ status: false, message: "Link/Url is required" })
-        return
-    }
-    //validation ends------------
-
-
-    const collegeData = { name, fullName, logoLink }
-    let newCollegeData = await collegeModel.create(collegeData);
-
-    res.status(201).send({ status: true, message: "college successfully created", data: newCollegeData })
 }
 
 
