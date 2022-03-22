@@ -3,7 +3,6 @@ const collegeModel = require("../models/collegeModel");
 
 
 
-
 //validation functions declaration
 
 //function 1-
@@ -27,7 +26,7 @@ const createIntern = async function (req, res) {
     try {
         data = req.body;
 
-        if (!isValidRequestBody) {
+        if (!isValidRequestBody(data)) {
             res.status(400).send({ status: false, message: "Invalid request parameters. Please provide intern details" })
         }
 
@@ -51,7 +50,7 @@ const createIntern = async function (req, res) {
             return
         }
 
-        //     //validation ends------------
+        //validation ends------------
         //------
 
         college = data.collegeName
@@ -83,19 +82,30 @@ const createIntern = async function (req, res) {
 const getCollege = async function (req, res) {
     let data = req.query;
 
+    if (!isValidRequestBody(data)) {
+        res.status(400).send({ status: false, message: "Please provide college name" })
+    }
+
     //getting college
     let newData = await collegeModel.findOne({ name: data.collegeName })
 
-    // if (newData) {
-    //     return res.status(201).send({ status: true, data: newData })
-    // }
+    if (!newData){
+        res.status(400).send({status: false, message:"no such data exist"})
+    }
 
     //getting interns
-    let interests = await internModel.find({ collegeId: newData._id })
-    //console.log(interests);
+    let interns = await internModel.find({ collegeId: newData._id })
 
-    return res.status(201).send({ status: true, data1: newData, data2: interests })
+    if (!interns){
+        res.status(400).send({status: false, message:"no such data exist"})
+    }
 
+    //adding key of interns/interests to object
+    let deepCopy = JSON.parse(JSON.stringify(newData));
+    deepCopy.interests = interns;  //adding this key to object
+
+
+    return res.status(201).send({ status: true, data: deepCopy })
 
 }
 
