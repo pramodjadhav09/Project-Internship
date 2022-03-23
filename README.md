@@ -119,25 +119,3 @@ Error Response structure
 
 
 
-
-
-url validation example by regex-
-
-const mongoose = require('mongoose');
-
-var userSchema = new mongoose.Schema({
-    downloadURL: {
-        type: String,
-        required: 'URL can\'t be empty',
-        unique: true
-    },
-    description: {
-        type: String,
-        required: 'Description can\'t be empty',
-    }
-});
-
-userSchema.path('downloadURL').validate((val) => {
-    urlRegex = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/;
-    return urlRegex.test(val);
-}, 'Invalid URL.');
